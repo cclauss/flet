@@ -1,9 +1,19 @@
-from typing import Any, Optional
+from typing import Optional, Any
 
-from flet_core.control import Control, OptionalNumber
+from flet_core.control import Control, auto_properties
 from flet_core.ref import Ref
+from flet_core.types import OptionalNumber
 
 
+@auto_properties(
+    {
+        "height": (OptionalNumber, OptionalNumber, "float", None),
+        "thickness": (OptionalNumber, OptionalNumber, "float", None),
+        "color": (Optional[str], Optional[str], "str", None),
+        "leadingIndent": (OptionalNumber, OptionalNumber, "float", None),
+        "trailingIndent": (OptionalNumber, OptionalNumber, "float", None),
+    }
+)
 class Divider(Control):
     """
     A thin horizontal line, with padding on either side.
@@ -77,52 +87,3 @@ class Divider(Control):
 
     def _get_control_name(self):
         return "divider"
-
-    # height
-    @property
-    def height(self) -> OptionalNumber:
-        return self._get_attr("height", data_type="float")
-
-    @height.setter
-    def height(self, value: OptionalNumber):
-        assert value is None or value >= 0, "height cannot be negative"
-        self._set_attr("height", value)
-
-    # thickness
-    @property
-    def thickness(self) -> OptionalNumber:
-        return self._get_attr("thickness", data_type="float")
-
-    @thickness.setter
-    def thickness(self, value: OptionalNumber):
-        assert value is None or value >= 0, "thickness cannot be negative"
-        self._set_attr("thickness", value)
-
-    # color
-    @property
-    def color(self) -> Optional[str]:
-        return self._get_attr("color")
-
-    @color.setter
-    def color(self, value: Optional[str]):
-        self._set_attr("color", value)
-
-    # leading_indent
-    @property
-    def leading_indent(self) -> OptionalNumber:
-        return self._get_attr("leadingIndent", data_type="float")
-
-    @leading_indent.setter
-    def leading_indent(self, value: OptionalNumber):
-        assert value is None or value >= 0, "leading_indent cannot be negative"
-        self._set_attr("leadingIndent", value)
-
-    # trailing_indent
-    @property
-    def trailing_indent(self) -> OptionalNumber:
-        return self._get_attr("trailingIndent", data_type="float")
-
-    @trailing_indent.setter
-    def trailing_indent(self, value: OptionalNumber):
-        assert value is None or value >= 0, "trailing_indent cannot be negative"
-        self._set_attr("trailingIndent", value)

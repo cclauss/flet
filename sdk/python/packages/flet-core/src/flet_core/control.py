@@ -12,6 +12,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    Tuple,
 )
 
 from flet_core.embed_json_encoder import EmbedJsonEncoder
@@ -35,6 +36,44 @@ except ImportError:
 
 V = TypeVar("V", str, int, float, bool, Any)
 DV = TypeVar("DV", bound=Optional[Any])
+
+
+def auto_properties(
+    attributes: Dict[str, Tuple[Type, Type, Optional[str], Optional[Any]]]
+):
+    def decorator(cls: Type):
+        for attr, v in attributes.items():
+            dtype, rtype, data_type, def_value = v
+            print(f"before: {attr} {dtype} {rtype} {data_type} {def_value}")
+
+            # Define getter and setter functions with specific closures
+            def make_getter(attr: str, rtype: Type, data_type: str, def_value: Any):
+                def getter(self: "Control") -> rtype:
+                    return self._get_attr(
+                        attr, data_type=data_type, def_value=def_value
+                    )
+
+                getter.__annotations__["return"] = rtype
+                return getter
+
+            def make_setter(attr: str, dtype: Type):
+                def setter(self: "Control", value: dtype) -> None:
+                    self._set_attr(attr, value)
+
+                setter.__annotations__["value"] = dtype
+                setter.__annotations__["return"] = None
+                return setter
+
+            # Create getter and setter functions
+            getter = make_getter(attr, rtype, data_type, def_value)
+            setter = make_setter(attr, dtype)
+
+            # Set property to the class
+            setattr(cls, attr, property(getter, setter))
+
+        return cls
+
+    return decorator
 
 
 class Control:
@@ -77,6 +116,11 @@ class Control:
 
     def is_isolated(self) -> bool:
         return False
+
+    @staticmethod
+    def validate_non_negative(value, name):
+        assert value is None or value >= 0, f"{name} cannot be negative"
+        return value
 
     def build(self):
         pass
